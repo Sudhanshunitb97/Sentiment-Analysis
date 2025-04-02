@@ -29,7 +29,7 @@ review = st.text_area("Enter your review below:")
 
 if st.button("Predict Rating"):
     tokens = preprocess(review)
-    vec = get_avg_vector(tokens, w2_model)
+    vec = get_avg_vector(tokens, w2model)
     if vec is None:
         st.error(" Review too short or contains unknown words.")
     else:
