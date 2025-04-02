@@ -14,7 +14,7 @@ def load_models():
 
 def preprocess(text):
     text = text.lower()
-    text = re.sub(r"[^a-z\\s]", "", text)
+    text = re.sub(r"[^a-z\s]", "", text)  # fixed regex
     tokens = text.split()
     return [word for word in tokens if word not in ENGLISH_STOP_WORDS]
 
@@ -30,8 +30,13 @@ review = st.text_area("Enter your review below:")
 if st.button("Predict Rating"):
     tokens = preprocess(review)
     vec = get_avg_vector(tokens, w2vmodel)
+
     if vec is None:
-        st.error(" Review too short or contains unknown words.")
+        st.error("❌ None of the words were recognized. Try a different review.")
+        st.warning("🧪 Debug info:")
+        st.code(tokens)
+        known_words = [word for word in tokens if word in w2vmodel.wv]
+        st.warning(f"✅ Known words found: {known_words}")
     else:
         rating = regressor.predict(vec.reshape(1, -1))[0]
-        st.success(f" Predicted Rating: {rating:.2f} / 10")
+        st.success(f"🎯 Predicted Rating: {rating:.2f} / 10")
