@@ -7,10 +7,10 @@ from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 @st.cache_resource
 def load_models():
-    w2vmodel = Word2Vec.load("w2vmodel.model")
-    with open("regressor.pkl", "rb") as f:
-        regressor = pickle.load(f)
-    return w2vmodel, regressor
+    w2vmodel_2 = Word2Vec.load("w2vmodel_2.model")
+    with open("regressor_2.pkl", "rb") as f:
+        regressor_2 = pickle.load(f)
+    return w2vmodel_2, regressor_2
 
 def preprocess(text):
     text = text.lower()
@@ -22,21 +22,21 @@ def get_avg_vector(tokens, model):
     vectors = [model.wv[word] for word in tokens if word in model.wv]
     return np.mean(vectors, axis=0) if vectors else None
 
-w2vmodel, regressor = load_models()
+w2vmodel_2, regressor_2 = load_models()
 
 st.title("🔮 JEE Coaching Review Rating Predictor")
 review = st.text_area("Enter your review below:")
 
 if st.button("Predict Rating"):
     tokens = preprocess(review)
-    vec = get_avg_vector(tokens, w2vmodel)
+    vec = get_avg_vector(tokens, w2vmodel_2)
 
     if vec is None:
         st.error(" None of the words were recognized. Try a different review.")
         st.warning(" Debug info:")
         st.code(tokens)
-        known_words = [word for word in tokens if word in w2vmodel.wv]
+        known_words = [word for word in tokens if word in w2vmodel_2.wv]
         st.warning(f" Known words found: {known_words}")
     else:
-        rating = regressor.predict(vec.reshape(1, -1))[0]
+        rating = regressor_2.predict(vec.reshape(1, -1))[0]
         st.success(f" Predicted Rating: {rating:.2f} / 10")
