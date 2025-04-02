@@ -32,11 +32,11 @@ if st.button("Predict Rating"):
     vec = get_avg_vector(tokens, w2vmodel)
 
     if vec is None:
-        st.error("❌ None of the words were recognized. Try a different review.")
-        st.warning("🧪 Debug info:")
+        st.error(" None of the words were recognized. Try a different review.")
+        st.warning(" Debug info:")
         st.code(tokens)
         known_words = [word for word in tokens if word in w2vmodel.wv]
-        st.warning(f"✅ Known words found: {known_words}")
+        st.warning(f" Known words found: {known_words}")
     else:
         rating = regressor.predict(vec.reshape(1, -1))[0]
-        st.success(f"🎯 Predicted Rating: {rating:.2f} / 10")
+        st.success(f" Predicted Rating: {rating:.2f} / 10")
