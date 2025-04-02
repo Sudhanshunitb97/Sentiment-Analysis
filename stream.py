@@ -1,0 +1,37 @@
+import streamlit as st
+import numpy as np
+import re
+import pickle
+from gensim.models import Word2Vec
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
+
+@st.cache_resource
+def load_models():
+    w2vmodel = Word2Vec.load("w2vmodel.model")
+    with open("regressor.pkl", "rb") as f:
+        regressor = pickle.load(f)
+    return w2vmodel, regressor
+
+def preprocess(text):
+    text = text.lower()
+    text = re.sub(r"[^a-z\\s]", "", text)
+    tokens = text.split()
+    return [word for word in tokens if word not in ENGLISH_STOP_WORDS]
+
+def get_avg_vector(tokens, model):
+    vectors = [model.wv[word] for word in tokens if word in model.wv]
+    return np.mean(vectors, axis=0) if vectors else None
+
+w2vmodel, regressor = load_models()
+
+st.title("🔮 JEE Coaching Review Rating Predictor")
+review = st.text_area("Enter your review below:")
+
+if st.button("Predict Rating"):
+    tokens = preprocess(review)
+    vec = get_avg_vector(tokens, w2_model)
+    if vec is None:
+        st.error(" Review too short or contains unknown words.")
+    else:
+        rating = regressor.predict(vec.reshape(1, -1))[0]
+        st.success(f" Predicted Rating: {rating:.2f} / 10")
